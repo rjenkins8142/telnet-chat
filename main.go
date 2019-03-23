@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/rjenkins8142/tchat/chatroom"
-	"github.com/rjenkins8142/tchat/config"
-	"github.com/rjenkins8142/tchat/version"
+	"github.com/rjenkins8142/telnet-chat/chatroom"
+	"github.com/rjenkins8142/telnet-chat/config"
+	"github.com/rjenkins8142/telnet-chat/version"
 	"github.com/spf13/viper"
 )
 
