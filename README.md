@@ -4,6 +4,13 @@
 
 Go 1.9+ (written with Go 1.12, but should work with most versions of Go that support dep.)
 
+## To clone:
+
+```
+$ go get github.com/rjenkins8142/telnet-chat
+$ cd $GOPATH/src/github.com/rjenkins8142/telnet-chat
+```
+
 ## To build:
 
 If GNU Make is installed:
