@@ -20,4 +20,14 @@ otherwise:
 
 Edit the config.toml file to change any default configuration settings.
 
+You can also use environment variables to override any config settings.
+
+For instance:
+```
+TCHAT_TCP_ADDR
+TCHAT_TCP_PORT
+TCHAT_LOG_FILEPATH
+```
+
 #### Dependency management is done with the default dep tool.
+
