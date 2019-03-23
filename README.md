@@ -21,9 +21,13 @@ otherwise:
 
 `$ go build`
 
+#### Dependency management is done with the default dep tool.
+
 ## Usage:
 
-`$ ./telnet-chat -h`
+### Start server
+
+`$ ./telnet-chat`
 
 Edit the config.toml file to change any default configuration settings.
 
@@ -36,5 +40,7 @@ TCHAT_TCP_PORT
 TCHAT_LOG_FILEPATH
 ```
 
-#### Dependency management is done with the default dep tool.
+### Connect via telnet
+
+`$ telnet 127.0.0.1 8080`
 
