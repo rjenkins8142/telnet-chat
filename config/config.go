@@ -11,6 +11,7 @@ import (
 // error occurs while parsing the config file.
 func ParseConfig(filepath string) {
 	viper.SetConfigFile(filepath)
+	viper.AddConfigPath(".")
 
 	// Map to new style automatic variables
 	viper.SetEnvPrefix("tchat")

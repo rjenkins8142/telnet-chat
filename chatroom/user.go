@@ -51,7 +51,7 @@ func (u *User) JoinRoomName(roomName string) error {
 // ServerMessage is how we communicate server messages to this user. Takes printf style parameters.
 func (u *User) ServerMessage(format string, msg ...interface{}) {
 	newMsg := fmt.Sprintf(format, msg...)
-	u.SimpleMessage("\n>> " + newMsg)
+	u.SimpleMessage(">> " + newMsg)
 }
 
 // Message is how we communicate to this user. Takes printf style parameters.

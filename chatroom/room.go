@@ -2,6 +2,7 @@ package chatroom
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 )
@@ -42,9 +43,17 @@ func (r *Room) listen() {
 			}
 			break
 		}
-		for _, person := range r.users {
-			// Send a message to each user
-			log.Printf("Sending [%s] to user [%s]\n", msg, person.nick)
+		r.notifyRoom(msg, false)
+	}
+}
+
+func (r *Room) notifyRoom(msg string, system bool) {
+	for _, person := range r.users {
+		// Send a message to each user
+		log.Printf("Sending [%s] to user [%s]\n", msg, person.nick)
+		if system {
+			person.ServerMessage(msg)
+		} else {
 			person.SimpleMessage(msg)
 		}
 	}
@@ -93,6 +102,7 @@ func FindRoom(roomName string) *Room {
 
 // Join is how a user gets connected to a room.
 func (r *Room) Join(user *User) error {
+	r.notifyRoom(fmt.Sprintf("User [%s] has joined the room", user.nick), true)
 	r.users = append(r.users, user)
 	log.Printf("User %s joined room %s\n", user.nick, r.name)
 	return nil
@@ -114,6 +124,7 @@ func (r *Room) Leave(user *User) error {
 	if found == false {
 		return errors.New("could not find the user to remove from room users list")
 	}
+	r.notifyRoom(fmt.Sprintf("User [%s] has left the room", user.nick), true)
 	return nil
 }
 

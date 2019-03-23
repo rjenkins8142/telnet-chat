@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -11,29 +10,29 @@ import (
 	"github.com/rjenkins8142/telnet-chat/chatroom"
 	"github.com/rjenkins8142/telnet-chat/config"
 	"github.com/rjenkins8142/telnet-chat/version"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	var configFile string
 	const (
 		defaultConfigFile = "config.toml"
 		configUsage       = "Full path/filename of the config file"
 	)
 
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage of %s (%s):\n", filepath.Base(os.Args[0]), version.Info())
-		flag.PrintDefaults()
+	pflagUsage := pflag.Usage
+	pflag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "%s (%s):\n", filepath.Base(os.Args[0]), version.Info())
+		pflagUsage()
 	}
 
-	flag.StringVar(&configFile, "config", defaultConfigFile, configUsage)
-	flag.StringVar(&configFile, "c", defaultConfigFile, configUsage)
+	configFile := pflag.StringP("config", "c", defaultConfigFile, configUsage)
 
-	flag.Parse()
+	pflag.Parse()
 
-	log.Printf("Reading config from %s...\n", configFile)
+	log.Printf("Reading config from %s...\n", *configFile)
 
-	config.ParseConfig(configFile)
+	config.ParseConfig(*configFile)
 
 	tcpAddr := viper.GetString("tcp.addr")
 	tcpPort := viper.GetString("tcp.port")
