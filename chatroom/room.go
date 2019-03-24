@@ -3,8 +3,9 @@ package chatroom
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Room describes a chat room that can be joined.
@@ -32,7 +33,7 @@ func CreateRoom(roomName string) (*Room, error) {
 	List = append(List, room)
 	// Kick off go-routine to listen for new messages in this room.
 	go room.listen()
-	log.Printf("Created room [%s]\n", roomName)
+	log.Printf("Created room [%s]", roomName)
 	return room, nil
 }
 
@@ -40,7 +41,7 @@ func CreateRoom(roomName string) (*Room, error) {
 func (r *Room) listen() {
 	for {
 		msg := <-r.messages
-		log.Printf("Received %s room message [%s]\n", r.name, msg)
+		log.Printf("Received %s room message [%s]", r.name, msg)
 		if msg == Cleanup {
 			if r.name != "lobby" {
 				err := RemoveRoom(r.name)
@@ -57,7 +58,7 @@ func (r *Room) listen() {
 func (r *Room) notifyRoom(msg string, system bool) {
 	for _, person := range r.users {
 		// Send a message to each user
-		log.Printf("Sending [%s] to user [%s]\n", msg, person.nick)
+		log.Printf("Sending [%s] to user [%s]", msg, person.nick)
 		if system {
 			person.ServerMessage(msg)
 		} else {
@@ -111,7 +112,7 @@ func FindRoom(roomName string) *Room {
 func (r *Room) Join(user *User) error {
 	r.notifyRoom(fmt.Sprintf("User [%s] has joined the room", user.nick), true)
 	r.users = append(r.users, user)
-	log.Printf("User %s joined room %s\n", user.nick, r.name)
+	log.Printf("User %s joined room %s", user.nick, r.name)
 	return nil
 }
 
@@ -147,6 +148,6 @@ func (r *Room) Name() string {
 
 // Send is how we communicate to the room.
 func (r *Room) Send(msg string) {
-	log.Printf("Sending [%s] to room [%s]\n", msg, r.name)
+	log.Printf("Sending [%s] to room [%s]", msg, r.name)
 	r.messages <- msg
 }

@@ -4,6 +4,16 @@ addr = "0.0.0.0"
 port = "8080"
 
 [log]
-level = "debug"
+# STDERR or STDOUT are also valid for filepath
+#filepath = "STDOUT"
+#filepath = "STDERR"
 filepath = "log.txt"
+# Possible levels are:
+#level = "panic"
+#level = "fatal"
+#level = "error"
+#level = "warn"
+#level = "info"
+level = "debug"
+#level = "trace"
 

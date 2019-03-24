@@ -3,10 +3,11 @@ package chatroom
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"net"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
