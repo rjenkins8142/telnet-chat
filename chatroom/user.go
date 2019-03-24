@@ -9,6 +9,18 @@ import (
 	"time"
 )
 
+// User describes a user connected to the server.
+type User struct {
+	nick    string
+	conn    net.Conn
+	room    *Room
+	message chan string
+	prompt  string
+	unread  string
+}
+
+var nickNames = make(map[string]bool)
+
 // CreateUser a new user with the given nick and connect them to a room.
 func CreateUser(conn net.Conn, room *Room) *User {
 	newUser := &User{
@@ -16,17 +28,45 @@ func CreateUser(conn net.Conn, room *Room) *User {
 		conn:    conn,
 		prompt:  "%s > ",
 	}
-	conn.Write([]byte("Please enter your name: "))
-	nick, err := newUser.readString()
-	if err != nil {
-		log.Fatal("unable to read user name")
-	}
-	newUser.nick = strings.Trim(nick, "\r\n")
+	nick := newUser.askForNick()
+	newUser.nick = nick
 	newUser.JoinRoom(room)
 	go newUser.commandHandler()
 	go newUser.messageHandler()
 	newUser.ServerMessage("Welcome %s, type /help for a list of commands.", newUser.nick)
 	return newUser
+}
+
+func (u *User) askForNick() string {
+	var nick string
+	var err error
+	for {
+		u.conn.Write([]byte("Please enter your name: "))
+		nick, err = u.readString()
+		if err != nil {
+			log.Fatal("unable to read user name")
+		}
+		nick = strings.Trim(nick, "\r\n")
+		if !existingNick(nick) {
+			addNick(nick)
+			break
+		}
+		u.conn.Write([]byte("That name is already taken, please choose another.\n"))
+	}
+	return nick
+}
+
+func addNick(nick string) {
+	allCaps := strings.ToUpper(nick)
+	nickNames[allCaps] = true
+}
+
+func existingNick(nick string) bool {
+	allCaps := strings.ToUpper(nick)
+	if _, ok := nickNames[allCaps]; ok {
+		return true
+	}
+	return false
 }
 
 // JoinRoom is how a user joins a room. Automatically leaves any previous room.
@@ -72,7 +112,11 @@ func (u *User) commandHandler() {
 			log.Printf("Warning: Unable to read input: %s", err)
 		}
 		msg = strings.Trim(msg, "\r\n")
-		if msg == "/exit" {
+		msg, err = HandleCommand(msg, u)
+		if err != nil {
+			log.Printf("Warning: Error during HandleCommand: %s", err)
+		}
+		if msg == "/cleanup/" {
 			u.cleanup()
 			break
 		}

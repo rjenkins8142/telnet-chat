@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+// Room describes a chat room that can be joined.
+type Room struct {
+	name     string
+	users    []*User
+	messages chan string
+}
+
 // List contains the current list of existing rooms.
 var List []*Room
 
@@ -34,7 +41,7 @@ func (r *Room) listen() {
 	for {
 		msg := <-r.messages
 		log.Printf("Received %s room message [%s]\n", r.name, msg)
-		if msg == "/done" {
+		if msg == "/cleanup/" {
 			if r.name != "lobby" {
 				err := RemoveRoom(r.name)
 				if err != nil {

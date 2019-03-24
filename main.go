@@ -48,6 +48,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating lobby: %s\n", err)
 	}
+	// Initialize all the chatroom "slash" commands.
+	chatroom.InitCommands()
 
 	log.Printf("Listening on %s:%s\n", tcpAddr, tcpPort)
 
