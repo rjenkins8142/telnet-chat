@@ -11,7 +11,6 @@ type Command struct {
 	aliases     []string    // List of other /slash commands that are aliases to this one
 	description string      // The description of the command
 	handler     commandFunc // The main handler function for the command
-	helper      commandFunc // The help function for the command
 }
 
 // ParsedCommand describes the parsed message
@@ -66,13 +65,11 @@ func InitCommands() {
 		aliases:     []string{"/?"},
 		description: "Show help (list of possible commands)",
 		handler:     helpHandler,
-		helper:      helpHelper,
 	})
 	RegisterCommand(&Command{
 		name:        "/exit",
 		aliases:     []string{"/logout", "/lo", "/quit"},
 		description: "Exit the chat program",
 		handler:     exitHandler,
-		helper:      exitHelper,
 	})
 }

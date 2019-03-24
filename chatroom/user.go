@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+const (
+	// Cleanup is how we tell the different goroutines that we're done and they should exit their respective loops.
+	Cleanup = "/cleanup/"
+)
+
 // User describes a user connected to the server.
 type User struct {
 	nick    string
@@ -105,6 +110,12 @@ func (u *User) SimpleMessage(msg string) {
 	u.message <- msg
 }
 
+// DirectMessage just writes to user.
+func (u *User) DirectMessage(msg string) {
+	msg = strings.Trim(msg, "\r\n")
+	u.conn.Write([]byte(msg + "\n"))
+}
+
 func (u *User) commandHandler() {
 	for {
 		msg, err := u.readString()
@@ -116,7 +127,7 @@ func (u *User) commandHandler() {
 		if err != nil {
 			log.Printf("Warning: Error during HandleCommand: %s", err)
 		}
-		if msg == "/cleanup/" {
+		if msg == Cleanup {
 			u.cleanup()
 			break
 		}
@@ -138,7 +149,7 @@ func (u *User) readString() (string, error) {
 func (u *User) messageHandler() {
 	for {
 		msg := <-u.message
-		if msg == "/done" {
+		if msg == Cleanup {
 			break
 		}
 		_, err := u.conn.Write([]byte("\n" + msg + "\n"))
@@ -157,7 +168,8 @@ func (u *User) writePrompt() {
 func (u *User) cleanup() {
 	// Tell the current room that we've left.
 	u.room.Leave(u)
-	u.message <- "/done"
+	// Tell the messageHandler that we're done.
+	u.message <- Cleanup
 	// Close the connection
 	u.conn.Close()
 }

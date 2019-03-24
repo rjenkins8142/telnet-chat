@@ -41,7 +41,7 @@ func (r *Room) listen() {
 	for {
 		msg := <-r.messages
 		log.Printf("Received %s room message [%s]\n", r.name, msg)
-		if msg == "/cleanup/" {
+		if msg == Cleanup {
 			if r.name != "lobby" {
 				err := RemoveRoom(r.name)
 				if err != nil {
