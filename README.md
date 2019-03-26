@@ -46,8 +46,8 @@ TCHAT_LOG_FILEPATH
 
 ## TODO
 
-Unit tests
-HTTP API
-Additional Chat Commands
-Better terminal handling?
+* Unit tests
+* HTTP/RESTful API
+* Additional Chat Commands
+* Better terminal handling?
 
