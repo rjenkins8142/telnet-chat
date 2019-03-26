@@ -1,6 +1,7 @@
 package chatroom
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -62,7 +63,7 @@ func RegisterCommand(command *Command) {
 func InitCommands() {
 	RegisterCommand(&Command{
 		name:        "/help",
-		aliases:     []string{"/?"},
+		aliases:     []string{"/h", "/?"},
 		description: "Show help (list of possible commands)",
 		handler:     helpHandler,
 	})
@@ -72,4 +73,69 @@ func InitCommands() {
 		description: "Exit the chat program",
 		handler:     exitHandler,
 	})
+	RegisterCommand(&Command{
+		name:        "/create",
+		aliases:     []string{"/createroom"},
+		description: "Create a new chat room",
+		handler:     createRoomHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/delete",
+		aliases:     []string{"/deleteroom", "/del"},
+		description: "Delete a chat room",
+		handler:     deleteRoomHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/join",
+		aliases:     []string{"/joinroom"},
+		description: "Join a new chat room",
+		handler:     joinRoomHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/list",
+		aliases:     []string{"/listrooms"},
+		description: "List the available chat rooms",
+		handler:     listRoomsHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/nick",
+		aliases:     []string{"/changenick"},
+		description: "Change your nickname",
+		handler:     changeNickHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/who",
+		aliases:     []string{"/w"},
+		description: "Show who is logged in",
+		handler:     whoHandler,
+	})
+	RegisterCommand(&Command{
+		name:        "/tell",
+		aliases:     []string{"/whisper"},
+		description: "Send a direct message to a user",
+		handler:     tellHandler,
+	})
+}
+
+func checkArgs(cmd *ParsedCommand, usage commandFunc, minArgs, maxArgs int) (bool, string, error) {
+	for _, arg := range cmd.args {
+		switch arg {
+		case "-h", "-?":
+			msg, err := usage(cmd)
+			return false, msg, err
+		}
+	}
+	if maxArgs >= 0 && len(cmd.args) > maxArgs {
+		msg := fmt.Sprintf("Too many arguments to %s. Got %d, expected %d.", cmd.command, len(cmd.args), maxArgs)
+		cmd.user.DirectMessage(msg)
+		msg, err := usage(cmd)
+		return false, msg, err
+	}
+	if len(cmd.args) < minArgs {
+		msg := fmt.Sprintf("Not enough arguments to %s. Got %d, expected %d.", cmd.command, len(cmd.args), minArgs)
+		cmd.user.DirectMessage(msg)
+		msg, err := usage(cmd)
+		return false, msg, err
+	}
+	return true, "", nil
 }

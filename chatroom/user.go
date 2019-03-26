@@ -32,7 +32,7 @@ func CreateUser(conn net.Conn, room *Room) *User {
 	newUser := &User{
 		message: make(chan string),
 		conn:    conn,
-		prompt:  "%s > ",
+		prompt:  "%s (%s) > ",
 	}
 	nick := newUser.askForNick()
 	newUser.nick = nick
@@ -73,6 +73,11 @@ func existingNick(nick string) bool {
 		return true
 	}
 	return false
+}
+
+func removeNick(nick string) {
+	allCaps := strings.ToUpper(nick)
+	delete(nickNames, allCaps)
 }
 
 // JoinRoom is how a user joins a room. Automatically leaves any previous room.
@@ -162,7 +167,7 @@ func (u *User) messageHandler() {
 }
 
 func (u *User) writePrompt() {
-	prmt := fmt.Sprintf(u.prompt, u.nick)
+	prmt := fmt.Sprintf(u.prompt, u.nick, u.room.name)
 	u.conn.Write([]byte(prmt))
 }
 
@@ -173,4 +178,6 @@ func (u *User) cleanup() {
 	u.message <- Cleanup
 	// Close the connection
 	u.conn.Close()
+	// Delete the nickname, so it can be re-used.
+	removeNick(u.nick)
 }

@@ -15,8 +15,8 @@ type Room struct {
 	messages chan string
 }
 
-// List contains the current list of existing rooms.
-var List []*Room
+// ListRooms contains the current list of existing rooms.
+var ListRooms []*Room
 
 // CreateRoom creates a new room.
 func CreateRoom(roomName string) (*Room, error) {
@@ -30,7 +30,7 @@ func CreateRoom(roomName string) (*Room, error) {
 		users:    make([]*User, 0),
 		messages: make(chan string),
 	}
-	List = append(List, room)
+	ListRooms = append(ListRooms, room)
 	// Kick off go-routine to listen for new messages in this room.
 	go room.listen()
 	log.Printf("Created room [%s]", roomName)
@@ -74,16 +74,16 @@ func RemoveRoom(roomName string) error {
 	}
 	i := FindRoomIdx(roomName)
 	if i >= 0 {
-		ourRoom := List[i]
+		ourRoom := ListRooms[i]
 		// First dump everyone in the room back to the lobby.
 		for _, person := range ourRoom.users {
 			person.ServerMessage("Deleting room %s, returning you to the lobby", ourRoom.name)
 			person.JoinRoomName("lobby")
 		}
 		// Delete element at i, in a GC safe way.
-		copy(List[i:], List[i+1:])
-		List[len(List)-1] = nil
-		List = List[:len(List)-1]
+		copy(ListRooms[i:], ListRooms[i+1:])
+		ListRooms[len(ListRooms)-1] = nil
+		ListRooms = ListRooms[:len(ListRooms)-1]
 		return nil
 	}
 	return errors.New("Unknown room")
@@ -91,7 +91,7 @@ func RemoveRoom(roomName string) error {
 
 // FindRoomIdx finds a room, given its name (case insensitive search). Returns the index to the found room or -1, if not found.
 func FindRoomIdx(roomName string) int {
-	for i, r := range List {
+	for i, r := range ListRooms {
 		if strings.EqualFold(r.name, roomName) {
 			return i
 		}
@@ -103,7 +103,7 @@ func FindRoomIdx(roomName string) int {
 func FindRoom(roomName string) *Room {
 	i := FindRoomIdx(roomName)
 	if i >= 0 {
-		return List[i]
+		return ListRooms[i]
 	}
 	return nil
 }
