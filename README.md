@@ -44,3 +44,10 @@ TCHAT_LOG_FILEPATH
 
 `$ telnet 127.0.0.1 8080`
 
+## TODO
+
+Unit tests
+HTTP API
+Additional Chat Commands
+Better terminal handling?
+
